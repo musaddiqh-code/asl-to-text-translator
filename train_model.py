@@ -9,10 +9,10 @@ Run:
     python train_model.py
 """
 
-from sklearn.metrics           import classification_report, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.preprocessing     import LabelEncoder
-from sklearn.model_selection   import train_test_split, cross_val_score
-from sklearn.ensemble          import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -27,12 +27,22 @@ TEST_SIZE = 0.2
 RANDOM_STATE = 42
 
 
+def normalize_row(row):
+    pts = row.reshape(21, 3)
+    pts = pts - pts[0]
+    scale = np.max(np.abs(pts)) or 1.0
+    pts = pts / scale
+    return pts.flatten()
+
+
 def load_data(path):
     df = pd.read_csv(path, encoding="utf-8")
     if df.empty:
         raise ValueError("CSV is empty — run collect_data.py first.")
 
-    X = df.drop(columns=["label"]).values.astype(np.float32)
+    X_raw = df.drop(columns=["label"]).values.astype(np.float32)
+    # normalize to match extract_landmarks
+    X = np.apply_along_axis(normalize_row, 1, X_raw)
     y = df["label"].values
 
     le = LabelEncoder()
