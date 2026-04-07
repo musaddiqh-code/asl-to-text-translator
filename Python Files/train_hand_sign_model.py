@@ -11,7 +11,7 @@ import os
 # -------------------------------
 # Load dataset
 # -------------------------------
-df = pd.read_csv("combined_dataset.csv", header=None)
+df = pd.read_csv("../data/combined_dataset.csv", header=None)
 
 print("Dataset shape:", df.shape)
 print(df.head())
@@ -115,11 +115,11 @@ disp.plot(cmap="Blues", xticks_rotation=45)
 plt.title("Confusion Matrix (ASL Letters)")
 plt.tight_layout()
 
-os.makedirs("data", exist_ok=True)
-plt.savefig("data/confusion_matrix.png")
+os.makedirs("../data", exist_ok=True)
+plt.savefig("../data/confusion_matrix.png")
 plt.show()
 
-print("📊 Confusion matrix saved → data/confusion_matrix.png")
+print("📊 Confusion matrix saved → ../data/confusion_matrix.png")
 
 # -------------------------------
 # Save model

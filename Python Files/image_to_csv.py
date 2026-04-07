@@ -33,7 +33,7 @@ options = vision.HandLandmarkerOptions(
 
 detector = vision.HandLandmarker.create_from_options(options)
 
-DATASET_PATH = "own_dataset"
+DATASET_PATH = "../own_dataset"
 
 data = []
 
@@ -68,6 +68,6 @@ for label in os.listdir(DATASET_PATH):
 
 # Save dataset
 df = pd.DataFrame(data)
-df.to_csv("final_dataset.csv", index=False, header=False)
+df.to_csv("../data/final_dataset.csv", index=False, header=False)
 
 print("Dataset created!")
