@@ -416,41 +416,38 @@
         <div class="asl-display-card">
           <div class="asl-display-header">
             <div class="asl-display-title">✋ ASL Signs</div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-ghost btn-sm" onclick="playbackASL()" id="playBtn">▶ Play</button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="asl-token-counter" id="tokenCounter"></span>
+              <button class="btn btn-ghost btn-sm" onclick="replayASL()" id="replayBtn" style="display:none;">↺ Replay</button>
               <button class="btn btn-ghost btn-sm" onclick="clearASLDisplay()">🗑 Clear</button>
             </div>
           </div>
 
-          <div class="play-progress" id="playProgress" aria-hidden="true">
+          <!-- Progress bar -->
+          <div class="play-progress visible" id="playProgress" aria-hidden="true">
             <div class="play-progress-fill" id="playFill"></div>
           </div>
 
-          <div class="asl-letters-grid" id="aslLettersGrid" aria-live="polite" aria-label="ASL signs for entered text">
+          <!-- Video player area -->
+          <div class="asl-video-area" id="aslVideoArea">
             <div class="asl-empty" id="aslEmpty">
               <div class="asl-empty-icon" aria-hidden="true">✋</div>
               <p>Type text above and click <strong>Translate</strong> to see ASL signs here.</p>
             </div>
+            <video id="aslVideo" style="display:none;" aria-label="ASL sign video" playsinline></video>
           </div>
 
+          <!-- Token queue — shows which sign is playing -->
+          <div class="asl-queue-bar" id="aslQueueBar"></div>
+
           <div class="playback-bar">
-            <div class="playback-speed">
-              Speed:
-              <select class="speed-select" id="speedSelect" aria-label="Playback speed">
-                <option value="300">Fast</option>
-                <option value="600" selected>Normal</option>
-                <option value="1000">Slow</option>
-              </select>
-            </div>
+            <div style="font-size:0.82rem;color:var(--ink3);" id="aslNowPlaying">—</div>
             <button class="btn btn-ghost btn-sm" onclick="copyT2AText()">📋 Copy text</button>
           </div>
         </div>
 
         <!-- ASL Reference Alphabet -->
-        <div class="asl-ref-card">
-          <div class="asl-ref-title">📖 ASL Alphabet Reference — click any sign to add it</div>
-          <div class="asl-alphabet-grid" id="aslRefGrid" aria-label="ASL alphabet reference"></div>
-        </div>
+        
 
       </div>
     </div>
