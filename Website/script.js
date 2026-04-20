@@ -96,7 +96,9 @@ const SIGN_DESC = {
 let currentLetters = []; // letters in current word
 let currentWord = ""; // assembled word
 let fullSentence = ""; // full sentence
-let history = JSON.parse(localStorage.getItem("signbridge_history") || "[]");
+let history = JSON.parse(
+  localStorage.getItem("Sign Language Assistant_history") || "[]",
+);
 let cameraStream = null;
 let isRecognizing = false;
 let simInterval = null;
@@ -161,11 +163,14 @@ function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute("data-theme") === "dark";
   html.setAttribute("data-theme", isDark ? "light" : "dark");
-  localStorage.setItem("signbridge_theme", isDark ? "light" : "dark");
+  localStorage.setItem(
+    "Sign Language Assistant_theme",
+    isDark ? "light" : "dark",
+  );
 }
 
 // Load saved theme
-const savedTheme = localStorage.getItem("signbridge_theme");
+const savedTheme = localStorage.getItem("Sign Language Assistant_theme");
 if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 
 /* ─── Toast ───────────────────────────────── */
@@ -480,21 +485,27 @@ function saveToHistory() {
   };
   history.unshift(entry);
   if (history.length > 20) history.pop();
-  localStorage.setItem("signbridge_history", JSON.stringify(history));
+  localStorage.setItem(
+    "Sign Language Assistant_history",
+    JSON.stringify(history),
+  );
   renderHistory();
   showToast("Saved to history!", "success");
 }
 
 function clearHistory() {
   history = [];
-  localStorage.removeItem("signbridge_history");
+  localStorage.removeItem("Sign Language Assistant_history");
   renderHistory();
   showToast("History cleared.", "info", 1500);
 }
 
 function deleteHistoryItem(id) {
   history = history.filter((h) => h.id !== id);
-  localStorage.setItem("signbridge_history", JSON.stringify(history));
+  localStorage.setItem(
+    "Sign Language Assistant_history",
+    JSON.stringify(history),
+  );
   renderHistory();
 }
 
@@ -574,22 +585,25 @@ function t2aKeydown(e) {
 }
 
 /* ─── T2A Video Playback ──────────────────── */
-let aslPlaylist   = [];   // array of { label, src } objects
-let aslPlayIndex  = 0;
-let aslPlaying    = false;
+let aslPlaylist = []; // array of { label, src } objects
+let aslPlayIndex = 0;
+let aslPlaying = false;
 
 // Fetch database.json once and cache it
 let _dbCache = null;
 async function getDatabase() {
   if (_dbCache) return _dbCache;
-  const res  = await fetch("database.json");
-  _dbCache   = await res.json();
+  const res = await fetch("database.json");
+  _dbCache = await res.json();
   return _dbCache;
 }
 
 async function translateText() {
   const raw = document.getElementById("t2aInput").value.trim();
-  if (!raw) { showToast("Please enter some text first.", "info", 2000); return; }
+  if (!raw) {
+    showToast("Please enter some text first.", "info", 2000);
+    return;
+  }
 
   const db = await getDatabase();
 
@@ -619,9 +633,9 @@ async function translateText() {
   // Remove trailing space token
   if (playlist.length && playlist[playlist.length - 1].isSpace) playlist.pop();
 
-  aslPlaylist  = playlist;
+  aslPlaylist = playlist;
   aslPlayIndex = 0;
-  aslPlaying   = false;
+  aslPlaying = false;
 
   // Render queue bar
   renderQueueBar(playlist);
@@ -631,7 +645,7 @@ async function translateText() {
   document.getElementById("playFill").style.width = "0%";
 
   // Show counter
-  const signCount = playlist.filter(t => t.src).length;
+  const signCount = playlist.filter((t) => t.src).length;
   document.getElementById("tokenCounter").textContent =
     signCount + " sign" + (signCount !== 1 ? "s" : "");
 
@@ -663,7 +677,7 @@ function renderQueueBar(playlist) {
 }
 
 function updateQueueBar(idx) {
-  document.querySelectorAll(".queue-token").forEach(el => {
+  document.querySelectorAll(".queue-token").forEach((el) => {
     const i = parseInt(el.dataset.qIdx);
     el.classList.remove("active", "done");
     if (i < idx) el.classList.add("done");
@@ -684,21 +698,22 @@ function playFromIndex(idx) {
   }
 
   aslPlayIndex = idx;
-  aslPlaying   = true;
+  aslPlaying = true;
 
   const token = aslPlaylist[idx];
 
   // Update progress bar
   const total = aslPlaylist.length;
-  document.getElementById("playFill").style.width = ((idx / total) * 100) + "%";
+  document.getElementById("playFill").style.width = (idx / total) * 100 + "%";
 
   // Update queue highlight
   updateQueueBar(idx);
 
   // Space token — pause briefly then move on
   if (token.isSpace || !token.src) {
-    document.getElementById("aslNowPlaying").textContent =
-      token.isSpace ? "[ space ]" : `⚠️ No video for "${token.label}"`;
+    document.getElementById("aslNowPlaying").textContent = token.isSpace
+      ? "[ space ]"
+      : `⚠️ No video for "${token.label}"`;
     setTimeout(() => playFromIndex(idx + 1), token.isSpace ? 300 : 200);
     return;
   }
@@ -707,8 +722,8 @@ function playFromIndex(idx) {
   const video = document.getElementById("aslVideo");
   const empty = document.getElementById("aslEmpty");
 
-  empty.style.display  = "none";
-  video.style.display  = "block";
+  empty.style.display = "none";
+  video.style.display = "block";
 
   document.getElementById("aslNowPlaying").textContent = `▶ ${token.label}`;
 
@@ -731,22 +746,22 @@ function replayASL() {
 }
 
 function clearASLDisplay() {
-  aslPlaylist  = [];
+  aslPlaylist = [];
   aslPlayIndex = 0;
-  aslPlaying   = false;
+  aslPlaying = false;
 
   const video = document.getElementById("aslVideo");
   video.pause();
-  video.src        = "";
+  video.src = "";
   video.style.display = "none";
 
-  document.getElementById("aslEmpty").style.display  = "flex";
-  document.getElementById("aslQueueBar").innerHTML   = "";
+  document.getElementById("aslEmpty").style.display = "flex";
+  document.getElementById("aslQueueBar").innerHTML = "";
   document.getElementById("playProgress").classList.remove("visible");
-  document.getElementById("playFill").style.width    = "0%";
+  document.getElementById("playFill").style.width = "0%";
   document.getElementById("aslNowPlaying").textContent = "—";
-  document.getElementById("tokenCounter").textContent  = "";
-  document.getElementById("replayBtn").style.display   = "none";
+  document.getElementById("tokenCounter").textContent = "";
+  document.getElementById("replayBtn").style.display = "none";
 
   document.getElementById("t2aInput").value = "";
   document.getElementById("charCount").textContent = "0";
@@ -754,8 +769,13 @@ function clearASLDisplay() {
 
 function copyT2AText() {
   const text = document.getElementById("t2aInput").value;
-  if (!text) { showToast("Nothing to copy.", "info", 1500); return; }
-  navigator.clipboard.writeText(text).then(() => showToast("Copied!", "success"));
+  if (!text) {
+    showToast("Nothing to copy.", "info", 1500);
+    return;
+  }
+  navigator.clipboard
+    .writeText(text)
+    .then(() => showToast("Copied!", "success"));
 }
 
 /* ─── Voice Input ─────────────────────────── */

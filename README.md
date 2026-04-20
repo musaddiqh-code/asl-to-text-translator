@@ -1,4 +1,4 @@
-# 🤟 SignBridge — ASL Translator
+# 🤟 Sign Language Assistant — ASL Translator
 
 > Real-time American Sign Language ↔ Text translation in your browser, powered by MediaPipe and a Random Forest classifier.
 
@@ -45,7 +45,7 @@ Webcam frame
 ## 🗂️ Project Structure
 
 ```
-signbridge/
+Sign Language Assistant/
 ├── index.html                  # Frontend SPA (4 pages: Home, ASL→Text, Text→ASL, About)
 ├── style.css                   # Design tokens, components, dark mode, responsive layout
 ├── script.js                   # All frontend logic — camera, prediction, history, playback
@@ -73,8 +73,8 @@ signbridge/
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/your-username/signbridge.git
-cd signbridge
+git clone https://github.com/your-username/Sign Language Assistant.git
+cd Sign Language Assistant
 
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
@@ -147,15 +147,15 @@ python -m http.server 5500
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
+| Layer         | Technology                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------- |
 | Hand tracking | [MediaPipe Hand Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker) |
-| ML classifier | scikit-learn `RandomForestClassifier` (300 trees, balanced class weights) |
-| Video capture | OpenCV |
-| Backend API | FastAPI + Uvicorn |
-| Frontend | Vanilla HTML / CSS / JS |
-| Voice input | Web Speech API |
-| Fonts | Outfit + JetBrains Mono (Google Fonts) |
+| ML classifier | scikit-learn `RandomForestClassifier` (300 trees, balanced class weights)                          |
+| Video capture | OpenCV                                                                                             |
+| Backend API   | FastAPI + Uvicorn                                                                                  |
+| Frontend      | Vanilla HTML / CSS / JS                                                                            |
+| Voice input   | Web Speech API                                                                                     |
+| Fonts         | Outfit + JetBrains Mono (Google Fonts)                                                             |
 
 ---
 
@@ -171,13 +171,13 @@ python -m http.server 5500
 
 ## 📊 Training Tips
 
-| Goal | Recommendation |
-|---|---|
-| Increase accuracy | 300+ samples per sign |
-| Reduce confusion between similar letters (e.g. M/N, U/V) | Record extra samples for confusable pairs |
-| Handle different users | Record with multiple people |
-| Improve lighting robustness | Record in bright, dim, and backlit conditions |
-| Swap the classifier | Replace `RandomForestClassifier` with `MLPClassifier` or a small Keras/PyTorch model |
+| Goal                                                     | Recommendation                                                                       |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Increase accuracy                                        | 300+ samples per sign                                                                |
+| Reduce confusion between similar letters (e.g. M/N, U/V) | Record extra samples for confusable pairs                                            |
+| Handle different users                                   | Record with multiple people                                                          |
+| Improve lighting robustness                              | Record in bright, dim, and backlit conditions                                        |
+| Swap the classifier                                      | Replace `RandomForestClassifier` with `MLPClassifier` or a small Keras/PyTorch model |
 
 ---
 
@@ -189,8 +189,8 @@ Upload a JPEG frame and receive a predicted sign.
 
 **Request** — `multipart/form-data`
 
-| Field | Type | Description |
-|---|---|---|
+| Field  | Type         | Description               |
+| ------ | ------------ | ------------------------- |
 | `file` | `UploadFile` | JPEG image of a hand sign |
 
 **Response**
@@ -206,11 +206,11 @@ Upload a JPEG frame and receive a predicted sign.
 
 ## 🌐 Browser Compatibility
 
-| Browser | ASL→Text camera | Voice input |
-|---|---|---|
-| Chrome / Edge | ✅ | ✅ |
-| Firefox | ✅ | ⚠️ partial |
-| Safari (macOS 14+) | ✅ | ⚠️ partial |
+| Browser            | ASL→Text camera | Voice input |
+| ------------------ | --------------- | ----------- |
+| Chrome / Edge      | ✅              | ✅          |
+| Firefox            | ✅              | ⚠️ partial  |
+| Safari (macOS 14+) | ✅              | ⚠️ partial  |
 
 > Camera access requires HTTPS in production (or `localhost` for development).
 
@@ -245,4 +245,4 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-*Built with ❤️ for the ASL community.*
+_Built with ❤️ for the ASL community._

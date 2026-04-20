@@ -1,631 +1,1007 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Language Assistant — ASL Translator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SignBridge — ASL Translator</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-    <link rel="stylesheet" href="style.css">
-  
-</head>
-
-<body>
-
-  <!-- ═══════════════════════════════════════════
+  <body>
+    <!-- ═══════════════════════════════════════════
      NAVBAR
 ═══════════════════════════════════════════ -->
-  <nav class="navbar" role="navigation" aria-label="Main navigation">
-    <a class="nav-logo" onclick="navigate('home')" style="cursor:pointer;">
-      <div class="nav-logo-icon" aria-hidden="true">🤟</div>
-      SignBridge
-    </a>
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <a class="nav-logo" onclick="navigate('home')" style="cursor: pointer">
+        <div class="nav-logo-icon" aria-hidden="true">🤟</div>
+        Sign Language Assistant
+      </a>
 
-    <ul class="nav-links" role="list">
-      <li><a class="nav-link active" onclick="navigate('home')" id="nl-home" tabindex="0">Home</a></li>
-      <li><a class="nav-link" onclick="navigate('asl2text')" id="nl-a2t" tabindex="0">ASL → Text</a></li>
-      <li><a class="nav-link" onclick="navigate('text2asl')" id="nl-t2a" tabindex="0">Text → ASL</a></li>
-      <li><a class="nav-link" onclick="navigate('about')" id="nl-about" tabindex="0">About</a></li>
-    </ul>
+      <ul class="nav-links" role="list">
+        <li>
+          <a
+            class="nav-link active"
+            onclick="navigate('home')"
+            id="nl-home"
+            tabindex="0"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            class="nav-link"
+            onclick="navigate('asl2text')"
+            id="nl-a2t"
+            tabindex="0"
+            >ASL → Text</a
+          >
+        </li>
+        <li>
+          <a
+            class="nav-link"
+            onclick="navigate('text2asl')"
+            id="nl-t2a"
+            tabindex="0"
+            >Text → ASL</a
+          >
+        </li>
+        <li>
+          <a
+            class="nav-link"
+            onclick="navigate('about')"
+            id="nl-about"
+            tabindex="0"
+            >About</a
+          >
+        </li>
+      </ul>
 
-    <div class="nav-actions">
-      <div class="theme-toggle-wrap">
-        <span aria-hidden="true">☀️</span>
-        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
-        <span aria-hidden="true">🌙</span>
+      <div class="nav-actions">
+        <div class="theme-toggle-wrap">
+          <span aria-hidden="true">☀️</span>
+          <button
+            class="theme-toggle"
+            onclick="toggleTheme()"
+            aria-label="Toggle dark mode"
+          ></button>
+          <span aria-hidden="true">🌙</span>
+        </div>
+        <button
+          class="hamburger"
+          onclick="toggleDrawer()"
+          aria-label="Open menu"
+          aria-expanded="false"
+          id="ham-btn"
+        >
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <button class="hamburger" onclick="toggleDrawer()" aria-label="Open menu" aria-expanded="false" id="ham-btn">
-        <span></span><span></span><span></span>
-      </button>
+    </nav>
+
+    <!-- Mobile drawer -->
+    <div class="nav-drawer" id="nav-drawer" role="navigation">
+      <a
+        class="nav-link"
+        onclick="
+          navigate('home');
+          closeDrawer();
+        "
+        >🏠 Home</a
+      >
+      <a
+        class="nav-link"
+        onclick="
+          navigate('asl2text');
+          closeDrawer();
+        "
+        >✋ ASL → Text</a
+      >
+      <a
+        class="nav-link"
+        onclick="
+          navigate('text2asl');
+          closeDrawer();
+        "
+        >⌨️ Text → ASL</a
+      >
+      <a
+        class="nav-link"
+        onclick="
+          navigate('about');
+          closeDrawer();
+        "
+        >ℹ️ About</a
+      >
     </div>
-  </nav>
 
-  <!-- Mobile drawer -->
-  <div class="nav-drawer" id="nav-drawer" role="navigation">
-    <a class="nav-link" onclick="navigate('home');   closeDrawer()">🏠 Home</a>
-    <a class="nav-link" onclick="navigate('asl2text'); closeDrawer()">✋ ASL → Text</a>
-    <a class="nav-link" onclick="navigate('text2asl'); closeDrawer()">⌨️ Text → ASL</a>
-    <a class="nav-link" onclick="navigate('about');  closeDrawer()">ℹ️ About</a>
-  </div>
+    <!-- Toast container -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Toast container -->
-  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- ═══════════════════════════════════════════
+    <!-- ═══════════════════════════════════════════
      HOME PAGE
 ═══════════════════════════════════════════ -->
-  <main class="page active" id="page-home" role="main">
-
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-bg">
-        <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
-        <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
-        <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
-      </div>
-      <div class="container hero-content" style="width:100%;">
-        <div class="hero-inner">
-
-          <div>
-            <div class="hero-eyebrow" aria-label="Real-time AI-powered translation">
-              ✨ Real-time AI-powered translation
-            </div>
-            <h1 class="hero-title">
-              Bridging <span class="gradient-text">ASL</span><br>
-              and the written<br>word
-            </h1>
-            <p class="hero-desc">
-              SignBridge translates American Sign Language gestures into text and back — in real time, right in your
-              browser. No downloads, no installs.
-            </p>
-            <div class="hero-cta">
-              <button class="btn btn-primary btn-lg" onclick="navigate('asl2text')">
-                ✋ ASL → Text
-              </button>
-              <button class="btn btn-secondary btn-lg" onclick="navigate('text2asl')">
-                ⌨️ Text → ASL
-              </button>
-            </div>
-            <div class="hero-stats">
-              <div>
-                <div class="hero-stat-num">26</div>
-                <div class="hero-stat-label">ASL Letters</div>
+    <main class="page active" id="page-home" role="main">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-bg">
+          <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+          <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+          <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
+        </div>
+        <div class="container hero-content" style="width: 100%">
+          <div class="hero-inner">
+            <div>
+              <div
+                class="hero-eyebrow"
+                aria-label="Real-time AI-powered translation"
+              >
+                ✨ Real-time AI-powered translation
               </div>
-              <div>
-                <div class="hero-stat-num">21</div>
-                <div class="hero-stat-label">Hand Landmarks</div>
+              <h1 class="hero-title">
+                Bridging <span class="gradient-text">ASL</span><br />
+                and the written<br />word
+              </h1>
+              <p class="hero-desc">
+                Sign Language Assistant translates American Sign Language
+                gestures into text and back — in real time, right in your
+                browser. No downloads, no installs.
+              </p>
+              <div class="hero-cta">
+                <button
+                  class="btn btn-primary btn-lg"
+                  onclick="navigate('asl2text')"
+                >
+                  ✋ ASL → Text
+                </button>
+                <button
+                  class="btn btn-secondary btn-lg"
+                  onclick="navigate('text2asl')"
+                >
+                  ⌨️ Text → ASL
+                </button>
               </div>
-              <div>
-                <div class="hero-stat-num">60fps</div>
-                <div class="hero-stat-label">Real-time</div>
+              <div class="hero-stats">
+                <div>
+                  <div class="hero-stat-num">26</div>
+                  <div class="hero-stat-label">ASL Letters</div>
+                </div>
+                <div>
+                  <div class="hero-stat-num">21</div>
+                  <div class="hero-stat-label">Hand Landmarks</div>
+                </div>
+                <div>
+                  <div class="hero-stat-num">60fps</div>
+                  <div class="hero-stat-label">Real-time</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+              <div class="hand-showcase">
+                <div class="hand-asl-display" id="heroEmoji">🤟</div>
+                <div class="hand-showcase-letters" id="heroLetterGrid"></div>
+              </div>
+              <div class="floating-badge floating-badge-1">
+                <span>🟢</span> Live Recognition
+              </div>
+              <div class="floating-badge floating-badge-2">
+                <span>🔒</span> On-device AI
               </div>
             </div>
           </div>
-
-          <div class="hero-visual" aria-hidden="true">
-            <div class="hand-showcase">
-              <div class="hand-asl-display" id="heroEmoji">🤟</div>
-              <div class="hand-showcase-letters" id="heroLetterGrid"></div>
-            </div>
-            <div class="floating-badge floating-badge-1">
-              <span>🟢</span> Live Recognition
-            </div>
-            <div class="floating-badge floating-badge-2">
-              <span>🔒</span> On-device AI
-            </div>
-          </div>
-
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Features -->
-    <section class="section"
-      style="background: var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
-      <div class="container">
-        <div class="section-label">✦ Features</div>
-        <h2 class="section-title">Everything you need to communicate</h2>
-        <p class="section-body">Real-time gesture detection, bidirectional translation, and an accessible UI built for
-          everyone.</p>
+      <!-- Features -->
+      <section
+        class="section"
+        style="
+          background: var(--surface);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+        "
+      >
+        <div class="container">
+          <div class="section-label">✦ Features</div>
+          <h2 class="section-title">Everything you need to communicate</h2>
+          <p class="section-body">
+            Real-time gesture detection, bidirectional translation, and an
+            accessible UI built for everyone.
+          </p>
 
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon fi-violet" aria-hidden="true">📷</div>
-            <div class="feature-title">Webcam ASL Recognition</div>
-            <div class="feature-desc">Point your camera, show a sign, and watch it convert to text instantly using
-              MediaPipe hand tracking.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon fi-blue" aria-hidden="true">🔤</div>
-            <div class="feature-title">Text to Sign Visuals</div>
-            <div class="feature-desc">Type any text and see each letter rendered as its ASL hand sign with animated
-              playback.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon fi-teal" aria-hidden="true">🌙</div>
-            <div class="feature-title">Dark Mode</div>
-            <div class="feature-desc">Switch between light and dark themes. Your preference is saved automatically.
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon fi-violet" aria-hidden="true">📷</div>
+              <div class="feature-title">Webcam ASL Recognition</div>
+              <div class="feature-desc">
+                Point your camera, show a sign, and watch it convert to text
+                instantly using MediaPipe hand tracking.
+              </div>
             </div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon fi-amber" aria-hidden="true">🎙️</div>
-            <div class="feature-title">Voice Input</div>
-            <div class="feature-desc">Dictate text using your microphone and instantly convert speech to ASL visual
-              guides.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon fi-violet" aria-hidden="true">📋</div>
-            <div class="feature-title">Translation History</div>
-            <div class="feature-desc">All your ASL sessions are saved locally so you can review past translations
-              anytime.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon fi-blue" aria-hidden="true">♿</div>
-            <div class="feature-title">Accessibility First</div>
-            <div class="feature-desc">Keyboard navigation, ARIA labels, focus rings, and screen reader support
-              throughout.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- How it works -->
-    <section class="section">
-      <div class="container">
-        <div class="section-label">⚙️ How It Works</div>
-        <h2 class="section-title">Simple as 1, 2, 3</h2>
-
-        <div class="hiw-grid">
-          <div class="hiw-step">
-            <div class="hiw-num">1</div>
-            <div class="hiw-step-icon" aria-hidden="true">📷</div>
-            <div class="hiw-step-title">Open your camera</div>
-            <div class="hiw-step-desc">Grant webcam access and let MediaPipe detect your hand landmarks in real time.
+            <div class="feature-card">
+              <div class="feature-icon fi-blue" aria-hidden="true">🔤</div>
+              <div class="feature-title">Text to Sign Visuals</div>
+              <div class="feature-desc">
+                Type any text and see each letter rendered as its ASL hand sign
+                with animated playback.
+              </div>
             </div>
-          </div>
-          <div class="hiw-step">
-            <div class="hiw-num">2</div>
-            <div class="hiw-step-icon" aria-hidden="true">🤲</div>
-            <div class="hiw-step-title">Show your sign</div>
-            <div class="hiw-step-desc">Form an ASL letter. The classifier matches it against 21 hand landmarks per
-              frame.</div>
-          </div>
-          <div class="hiw-step">
-            <div class="hiw-num">3</div>
-            <div class="hiw-step-icon" aria-hidden="true">✍️</div>
-            <div class="hiw-step-title">See the text</div>
-            <div class="hiw-step-desc">Letters build into words, words build into sentences — with confidence scoring
-              throughout.</div>
-          </div>
-          <div class="hiw-step">
-            <div class="hiw-num">4</div>
-            <div class="hiw-step-icon" aria-hidden="true">💾</div>
-            <div class="hiw-step-title">Save and share</div>
-            <div class="hiw-step-desc">Copy your translated text or browse your session history saved in the browser.
+            <div class="feature-card">
+              <div class="feature-icon fi-teal" aria-hidden="true">🌙</div>
+              <div class="feature-title">Dark Mode</div>
+              <div class="feature-desc">
+                Switch between light and dark themes. Your preference is saved
+                automatically.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon fi-amber" aria-hidden="true">🎙️</div>
+              <div class="feature-title">Voice Input</div>
+              <div class="feature-desc">
+                Dictate text using your microphone and instantly convert speech
+                to ASL visual guides.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon fi-violet" aria-hidden="true">📋</div>
+              <div class="feature-title">Translation History</div>
+              <div class="feature-desc">
+                All your ASL sessions are saved locally so you can review past
+                translations anytime.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon fi-blue" aria-hidden="true">♿</div>
+              <div class="feature-title">Accessibility First</div>
+              <div class="feature-desc">
+                Keyboard navigation, ARIA labels, focus rings, and screen reader
+                support throughout.
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- CTA Banner -->
-    <section class="section-sm" style="background: var(--surface); border-top:1px solid var(--border);">
-      <div class="container" style="text-align:center;">
-        <h2 class="section-title" style="margin:0 auto 12px;">Ready to start signing?</h2>
-        <p class="section-body" style="margin:0 auto 28px;">No account, no install — open your camera and begin.</p>
-        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn btn-primary btn-lg" onclick="navigate('asl2text')">✋ Start ASL → Text</button>
-          <button class="btn btn-secondary btn-lg" onclick="navigate('text2asl')">⌨️ Start Text → ASL</button>
-        </div>
-      </div>
-    </section>
+      <!-- How it works -->
+      <section class="section">
+        <div class="container">
+          <div class="section-label">⚙️ How It Works</div>
+          <h2 class="section-title">Simple as 1, 2, 3</h2>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-inner">
-          <div class="footer-brand">
-            <div class="nav-logo"
-              style="display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;color:var(--ink);margin-bottom:12px;">
-              <div class="nav-logo-icon" aria-hidden="true">🤟</div> SignBridge
+          <div class="hiw-grid">
+            <div class="hiw-step">
+              <div class="hiw-num">1</div>
+              <div class="hiw-step-icon" aria-hidden="true">📷</div>
+              <div class="hiw-step-title">Open your camera</div>
+              <div class="hiw-step-desc">
+                Grant webcam access and let MediaPipe detect your hand landmarks
+                in real time.
+              </div>
             </div>
-            <p class="footer-tagline">Bridging American Sign Language and text in real time for the Deaf and Hard of
-              Hearing community.</p>
-          </div>
-          <div>
-            <div class="footer-col-title">Navigate</div>
-            <ul class="footer-links">
-              <li><span class="footer-link" onclick="navigate('home')">Home</span></li>
-              <li><span class="footer-link" onclick="navigate('asl2text')">ASL → Text</span></li>
-              <li><span class="footer-link" onclick="navigate('text2asl')">Text → ASL</span></li>
-              <li><span class="footer-link" onclick="navigate('about')">About</span></li>
-            </ul>
-          </div>
-          <div>
-            <div class="footer-col-title">Tech Stack</div>
-            <ul class="footer-links">
-              <li><span class="footer-link">MediaPipe Hands</span></li>
-              <li><span class="footer-link">scikit-learn RF</span></li>
-              <li><span class="footer-link">OpenCV</span></li>
-              <li><span class="footer-link">Web Speech API</span></li>
-            </ul>
+            <div class="hiw-step">
+              <div class="hiw-num">2</div>
+              <div class="hiw-step-icon" aria-hidden="true">🤲</div>
+              <div class="hiw-step-title">Show your sign</div>
+              <div class="hiw-step-desc">
+                Form an ASL letter. The classifier matches it against 21 hand
+                landmarks per frame.
+              </div>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">3</div>
+              <div class="hiw-step-icon" aria-hidden="true">✍️</div>
+              <div class="hiw-step-title">See the text</div>
+              <div class="hiw-step-desc">
+                Letters build into words, words build into sentences — with
+                confidence scoring throughout.
+              </div>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">4</div>
+              <div class="hiw-step-icon" aria-hidden="true">💾</div>
+              <div class="hiw-step-title">Save and share</div>
+              <div class="hiw-step-desc">
+                Copy your translated text or browse your session history saved
+                in the browser.
+              </div>
+            </div>
           </div>
         </div>
-        <div class="footer-bottom">
-          <span class="footer-copy">© 2025 SignBridge. Built for accessibility.</span>
-          <span class="footer-made">Made with ❤️ for the ASL community</span>
+      </section>
+
+      <!-- CTA Banner -->
+      <section
+        class="section-sm"
+        style="background: var(--surface); border-top: 1px solid var(--border)"
+      >
+        <div class="container" style="text-align: center">
+          <h2 class="section-title" style="margin: 0 auto 12px">
+            Ready to start signing?
+          </h2>
+          <p class="section-body" style="margin: 0 auto 28px">
+            No account, no install — open your camera and begin.
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 14px;
+              justify-content: center;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="btn btn-primary btn-lg"
+              onclick="navigate('asl2text')"
+            >
+              ✋ Start ASL → Text
+            </button>
+            <button
+              class="btn btn-secondary btn-lg"
+              onclick="navigate('text2asl')"
+            >
+              ⌨️ Start Text → ASL
+            </button>
+          </div>
         </div>
-      </div>
-    </footer>
+      </section>
 
-  </main>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-inner">
+            <div class="footer-brand">
+              <div
+                class="nav-logo"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-weight: 800;
+                  font-size: 1.15rem;
+                  color: var(--ink);
+                  margin-bottom: 12px;
+                "
+              >
+                <div class="nav-logo-icon" aria-hidden="true">🤟</div>
+                Sign Language Assistant
+              </div>
+              <p class="footer-tagline">
+                Bridging American Sign Language and text in real time for the
+                Deaf and Hard of Hearing community.
+              </p>
+            </div>
+            <div>
+              <div class="footer-col-title">Navigate</div>
+              <ul class="footer-links">
+                <li>
+                  <span class="footer-link" onclick="navigate('home')"
+                    >Home</span
+                  >
+                </li>
+                <li>
+                  <span class="footer-link" onclick="navigate('asl2text')"
+                    >ASL → Text</span
+                  >
+                </li>
+                <li>
+                  <span class="footer-link" onclick="navigate('text2asl')"
+                    >Text → ASL</span
+                  >
+                </li>
+                <li>
+                  <span class="footer-link" onclick="navigate('about')"
+                    >About</span
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div class="footer-col-title">Tech Stack</div>
+              <ul class="footer-links">
+                <li><span class="footer-link">MediaPipe Hands</span></li>
+                <li><span class="footer-link">scikit-learn RF</span></li>
+                <li><span class="footer-link">OpenCV</span></li>
+                <li><span class="footer-link">Web Speech API</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <span class="footer-copy"
+              >© 2025 Sign Language Assistant. Built for accessibility.</span
+            >
+            <span class="footer-made">Made with ❤️ for the ASL community</span>
+          </div>
+        </div>
+      </footer>
+    </main>
 
-  <!-- ═══════════════════════════════════════════
+    <!-- ═══════════════════════════════════════════
      ASL TO TEXT PAGE
 ═══════════════════════════════════════════ -->
-  <main class="page" id="page-asl2text" role="main">
-    <div class="container">
+    <main class="page" id="page-asl2text" role="main">
+      <div class="container">
+        <div class="page-header">
+          <div class="section-label">✋ Live Recognition</div>
+          <h1 class="section-title">ASL → Text</h1>
+          <p class="page-header-subtitle">
+            Show ASL signs to your webcam — recognized letters build into words
+            and sentences below.
+          </p>
+        </div>
 
-      <div class="page-header">
-        <div class="section-label">✋ Live Recognition</div>
-        <h1 class="section-title">ASL → Text</h1>
-        <p class="page-header-subtitle">Show ASL signs to your webcam — recognized letters build into words and
-          sentences below.</p>
-      </div>
+        <div class="asl-layout">
+          <!-- Camera panel -->
+          <div class="cam-panel">
+            <div class="cam-header">
+              <div class="cam-title">📷 Camera Feed</div>
+              <div class="cam-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Offline</span>
+              </div>
+            </div>
 
-      <div class="asl-layout">
+            <div class="cam-viewport" id="camViewport">
+              <video
+                id="webcam"
+                autoplay
+                muted
+                playsinline
+                aria-label="Webcam feed"
+              ></video>
+              <div class="cam-placeholder" id="camPlaceholder">
+                <div class="cam-placeholder-icon" aria-hidden="true">📷</div>
+                <p>Click "Start Camera" below to begin ASL recognition</p>
+              </div>
+              <!-- Corner overlays -->
+              <div class="cam-scan-corner tl" aria-hidden="true"></div>
+              <div class="cam-scan-corner tr" aria-hidden="true"></div>
+              <div class="cam-scan-corner bl" aria-hidden="true"></div>
+              <div class="cam-scan-corner br" aria-hidden="true"></div>
+              <div class="cam-scan-line" aria-hidden="true"></div>
+              <!-- Prediction overlay -->
+              <div class="pred-overlay" id="predOverlay" aria-live="polite">
+                <div class="pred-letter" id="predLetter">?</div>
+                <div class="pred-conf" id="predConf">Confidence</div>
+                <div class="pred-conf-bar">
+                  <div class="pred-conf-fill" id="predFill"></div>
+                </div>
+              </div>
+            </div>
 
-        <!-- Camera panel -->
-        <div class="cam-panel">
-          <div class="cam-header">
-            <div class="cam-title">📷 Camera Feed</div>
-            <div class="cam-status">
-              <div class="status-dot" id="statusDot"></div>
-              <span id="statusText">Offline</span>
+            <div class="cam-controls">
+              <button
+                class="btn btn-teal"
+                id="camStartBtn"
+                onclick="startCamera()"
+              >
+                ▶ Start Camera
+              </button>
+              <button
+                class="btn btn-danger"
+                id="camStopBtn"
+                onclick="stopCamera()"
+                style="display: none"
+              >
+                ⏹ Stop
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="addSpace()">
+                Space
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="deleteLastLetter()">
+                ⌫ Delete
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="finalizeWord()">
+                ↵ Word
+              </button>
             </div>
           </div>
 
-          <div class="cam-viewport" id="camViewport">
-            <video id="webcam" autoplay muted playsinline aria-label="Webcam feed"></video>
-            <div class="cam-placeholder" id="camPlaceholder">
-              <div class="cam-placeholder-icon" aria-hidden="true">📷</div>
-              <p>Click "Start Camera" below to begin ASL recognition</p>
+          <!-- Output panel -->
+          <div class="output-panel">
+            <div class="output-header">
+              <div class="output-title">📝 Recognized Text</div>
+              <div class="output-actions">
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="copyText()"
+                  title="Copy text"
+                >
+                  📋 Copy
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="clearAll()"
+                  title="Clear all"
+                >
+                  🗑 Clear
+                </button>
+              </div>
             </div>
-            <!-- Corner overlays -->
-            <div class="cam-scan-corner tl" aria-hidden="true"></div>
-            <div class="cam-scan-corner tr" aria-hidden="true"></div>
-            <div class="cam-scan-corner bl" aria-hidden="true"></div>
-            <div class="cam-scan-corner br" aria-hidden="true"></div>
-            <div class="cam-scan-line" aria-hidden="true"></div>
-            <!-- Prediction overlay -->
-            <div class="pred-overlay" id="predOverlay" aria-live="polite">
-              <div class="pred-letter" id="predLetter">?</div>
-              <div class="pred-conf" id="predConf">Confidence</div>
-              <div class="pred-conf-bar">
-                <div class="pred-conf-fill" id="predFill"></div>
+            <div class="output-body">
+              <div>
+                <div
+                  style="
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: var(--ink3);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                  "
+                >
+                  Current Word
+                </div>
+                <div
+                  class="letter-stream"
+                  id="letterStream"
+                  aria-live="polite"
+                  aria-label="Current letters"
+                ></div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: var(--ink3);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                  "
+                >
+                  Word Buffer
+                </div>
+                <div class="word-display" id="wordDisplay" aria-live="polite">
+                  <span class="word-cursor" aria-hidden="true"></span>
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: var(--ink3);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                  "
+                >
+                  Full Sentence
+                </div>
+                <textarea
+                  class="sentence-area"
+                  id="sentenceArea"
+                  placeholder="Your translated sentence will appear here…"
+                  aria-label="Full translated sentence"
+                  readonly
+                ></textarea>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="saveToHistory()"
+                >
+                  💾 Save
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="copyText()">
+                  📋 Copy
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="clearAll()">
+                  🗑 Clear
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="cam-controls">
-            <button class="btn btn-teal" id="camStartBtn" onclick="startCamera()">▶ Start Camera</button>
-            <button class="btn btn-danger" id="camStopBtn" onclick="stopCamera()" style="display:none;">⏹ Stop</button>
-            <button class="btn btn-ghost btn-sm" onclick="addSpace()">Space</button>
-            <button class="btn btn-ghost btn-sm" onclick="deleteLastLetter()">⌫ Delete</button>
-            <button class="btn btn-ghost btn-sm" onclick="finalizeWord()">↵ Word</button>
+          <!-- Simulation panel -->
+          <div class="sim-panel">
+            <div class="sim-title">
+              🎮 Simulate Recognition — click any letter to test output
+            </div>
+            <div
+              class="sim-letters"
+              id="simLetters"
+              role="group"
+              aria-label="Simulate letter input"
+            ></div>
           </div>
-        </div>
 
-        <!-- Output panel -->
-        <div class="output-panel">
-          <div class="output-header">
-            <div class="output-title">📝 Recognized Text</div>
-            <div class="output-actions">
-              <button class="btn btn-ghost btn-sm" onclick="copyText()" title="Copy text">📋 Copy</button>
-              <button class="btn btn-ghost btn-sm" onclick="clearAll()" title="Clear all">🗑 Clear</button>
-            </div>
-          </div>
-          <div class="output-body">
-            <div>
-              <div
-                style="font-size:0.78rem;font-weight:600;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">
-                Current Word</div>
-              <div class="letter-stream" id="letterStream" aria-live="polite" aria-label="Current letters"></div>
-            </div>
-            <div>
-              <div
-                style="font-size:0.78rem;font-weight:600;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">
-                Word Buffer</div>
-              <div class="word-display" id="wordDisplay" aria-live="polite">
-                <span class="word-cursor" aria-hidden="true"></span>
+          <!-- History -->
+          <div class="history-panel">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              <div class="sim-title" style="margin: 0">
+                📋 Translation History
               </div>
+              <button class="btn btn-ghost btn-sm" onclick="clearHistory()">
+                Clear All
+              </button>
             </div>
-            <div>
-              <div
-                style="font-size:0.78rem;font-weight:600;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">
-                Full Sentence</div>
-              <textarea class="sentence-area" id="sentenceArea" placeholder="Your translated sentence will appear here…"
-                aria-label="Full translated sentence" readonly></textarea>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn btn-primary btn-sm" onclick="saveToHistory()">💾 Save</button>
-              <button class="btn btn-ghost btn-sm" onclick="copyText()">📋 Copy</button>
-              <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑 Clear</button>
-            </div>
+            <div
+              class="history-list"
+              id="historyList"
+              aria-live="polite"
+              aria-label="Translation history"
+            ></div>
           </div>
         </div>
-
-        <!-- Simulation panel -->
-        <div class="sim-panel">
-          <div class="sim-title">🎮 Simulate Recognition — click any letter to test output</div>
-          <div class="sim-letters" id="simLetters" role="group" aria-label="Simulate letter input"></div>
-        </div>
-
-        <!-- History -->
-        <div class="history-panel">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div class="sim-title" style="margin:0;">📋 Translation History</div>
-            <button class="btn btn-ghost btn-sm" onclick="clearHistory()">Clear All</button>
-          </div>
-          <div class="history-list" id="historyList" aria-live="polite" aria-label="Translation history"></div>
-        </div>
-
       </div>
-    </div>
-  </main>
+    </main>
 
-  <!-- ═══════════════════════════════════════════
+    <!-- ═══════════════════════════════════════════
      TEXT TO ASL PAGE
 ═══════════════════════════════════════════ -->
-  <main class="page" id="page-text2asl" role="main">
-    <div class="container">
-
-      <div class="page-header">
-        <div class="section-label">⌨️ Visual Dictionary</div>
-        <h1 class="section-title">Text → ASL</h1>
-        <p class="page-header-subtitle">Type any text and see each letter displayed as its ASL hand sign. Supports
-          animated playback.</p>
-      </div>
-
-      <div class="t2a-layout">
-
-        <!-- Input -->
-        <div class="input-card">
-          <div class="input-card-title">⌨️ Enter Text to Translate</div>
-          <textarea class="text-input-area" id="t2aInput" placeholder="Type something… e.g. HELLO WORLD" maxlength="120"
-            rows="3" oninput="onT2AInput()" onkeydown="t2aKeydown(event)" aria-label="Text to translate into ASL"
-            spellcheck="false"></textarea>
-          <div class="input-footer">
-            <span class="char-count"><span id="charCount">0</span> / 120</span>
-            <div class="input-opts">
-              <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
-                🎙️ Voice
-              </button>
-              <button class="btn btn-primary" onclick="translateText()">
-                ✋ Translate
-              </button>
-            </div>
-          </div>
+    <main class="page" id="page-text2asl" role="main">
+      <div class="container">
+        <div class="page-header">
+          <div class="section-label">⌨️ Visual Dictionary</div>
+          <h1 class="section-title">Text → ASL</h1>
+          <p class="page-header-subtitle">
+            Type any text and see each letter displayed as its ASL hand sign.
+            Supports animated playback.
+          </p>
         </div>
 
-        <!-- ASL display -->
-        <div class="asl-display-card">
-          <div class="asl-display-header">
-            <div class="asl-display-title">✋ ASL Signs</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <span class="asl-token-counter" id="tokenCounter"></span>
-              <button class="btn btn-ghost btn-sm" onclick="replayASL()" id="replayBtn" style="display:none;">↺ Replay</button>
-              <button class="btn btn-ghost btn-sm" onclick="clearASLDisplay()">🗑 Clear</button>
-            </div>
-          </div>
-
-          <!-- Progress bar -->
-          <div class="play-progress visible" id="playProgress" aria-hidden="true">
-            <div class="play-progress-fill" id="playFill"></div>
-          </div>
-
-          <!-- Video player area -->
-          <div class="asl-video-area" id="aslVideoArea">
-            <div class="asl-empty" id="aslEmpty">
-              <div class="asl-empty-icon" aria-hidden="true">✋</div>
-              <p>Type text above and click <strong>Translate</strong> to see ASL signs here.</p>
-            </div>
-            <video id="aslVideo" style="display:none;" aria-label="ASL sign video" playsinline></video>
-          </div>
-
-          <!-- Token queue — shows which sign is playing -->
-          <div class="asl-queue-bar" id="aslQueueBar"></div>
-
-          <div class="playback-bar">
-            <div style="font-size:0.82rem;color:var(--ink3);" id="aslNowPlaying">—</div>
-            <button class="btn btn-ghost btn-sm" onclick="copyT2AText()">📋 Copy text</button>
-          </div>
-        </div>
-
-        <!-- ASL Reference Alphabet -->
-        
-
-      </div>
-    </div>
-  </main>
-
-  <!-- ═══════════════════════════════════════════
-     ABOUT PAGE
-═══════════════════════════════════════════ -->
-  <main class="page" id="page-about" role="main">
-    <div class="container">
-
-      <div class="page-header" style="text-align:left;padding-bottom:0;">
-        <div class="section-label">ℹ️ About</div>
-      </div>
-
-      <div class="about-layout">
-
-        <div>
-          <h1 class="about-hero-text"
-            style="font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:20px;">
-            Making ASL<br>
-            <span
-              style="background:var(--grad-hero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">accessible
-              to all</span>
-          </h1>
-          <p class="about-body">
-            SignBridge is a browser-based tool for translating between American Sign Language gestures and written text
-            — in real time. It was built to make communication more accessible for the Deaf and Hard of Hearing
-            community.
-          </p>
-          <p class="about-body">
-            American Sign Language is the primary language for over <strong>500,000</strong> people in the United States
-            and Canada. It is a complete, natural language with its own grammar, syntax, and cultural richness —
-            distinct from English.
-          </p>
-          <p class="about-body">
-            This tool uses computer vision to track hand landmarks and a machine learning classifier to match them to
-            ASL letters — running entirely in your browser with no data sent to any server.
-          </p>
-
-          <div class="fact-cards">
-            <div class="fact-card">
-              <div class="fact-num">500K+</div>
-              <div class="fact-label">ASL users in North America</div>
-            </div>
-            <div class="fact-card">
-              <div class="fact-num">26</div>
-              <div class="fact-label">Letters in the ASL alphabet</div>
-            </div>
-            <div class="fact-card">
-              <div class="fact-num">21</div>
-              <div class="fact-label">Hand landmarks tracked</div>
-            </div>
-            <div class="fact-card">
-              <div class="fact-num">100%</div>
-              <div class="fact-label">On-device processing</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="about-cards">
-
-          <div class="about-info-card">
-            <div class="about-info-header">
-              <div class="about-info-icon fi-violet" style="background:var(--violet-lt);" aria-hidden="true">🎯</div>
-              <div class="about-info-title">Purpose</div>
-            </div>
-            <div class="about-info-body">
-              To reduce communication barriers between hearing and Deaf communities by making ASL translation fast,
-              free, and accessible directly in the browser.
-            </div>
-          </div>
-
-          <div class="about-info-card">
-            <div class="about-info-header">
-              <div class="about-info-icon" style="background:var(--blue-lt);" aria-hidden="true">🔬</div>
-              <div class="about-info-title">How It Works</div>
-            </div>
-            <div class="about-info-body">
-              MediaPipe Hands extracts 21 3D landmarks per frame. These are normalised (wrist = origin, unit bounding
-              box) and fed to a Random Forest classifier trained on ASL letter samples. Predictions are smoothed over a
-              10-frame window.
-            </div>
-          </div>
-
-          <div class="about-info-card">
-            <div class="about-info-header">
-              <div class="about-info-icon" style="background:var(--teal-lt);" aria-hidden="true">🔒</div>
-              <div class="about-info-title">Privacy</div>
-            </div>
-            <div class="about-info-body">
-              All processing happens on your device. No video frames, no landmark data, and no text is ever sent to a
-              server. Your camera feed never leaves your browser.
-            </div>
-          </div>
-
-          <div class="about-info-card">
-            <div class="about-info-header">
-              <div class="about-info-icon" style="background:var(--amber-lt);" aria-hidden="true">⚙️</div>
-              <div class="about-info-title">Technologies Used</div>
-            </div>
-            <div class="about-info-body">
-              <div class="tech-grid">
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">🖐</span>
-                  <div class="tech-info">
-                    <div class="tech-name">MediaPipe</div>
-                    <div class="tech-role">Hand landmarks</div>
-                  </div>
-                </div>
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">🌲</span>
-                  <div class="tech-info">
-                    <div class="tech-name">scikit-learn</div>
-                    <div class="tech-role">RF Classifier</div>
-                  </div>
-                </div>
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">👁️</span>
-                  <div class="tech-info">
-                    <div class="tech-name">OpenCV</div>
-                    <div class="tech-role">Video capture</div>
-                  </div>
-                </div>
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">🎙️</span>
-                  <div class="tech-info">
-                    <div class="tech-name">Web Speech</div>
-                    <div class="tech-role">Voice input</div>
-                  </div>
-                </div>
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">🌐</span>
-                  <div class="tech-info">
-                    <div class="tech-name">HTML/CSS/JS</div>
-                    <div class="tech-role">Frontend</div>
-                  </div>
-                </div>
-                <div class="tech-item">
-                  <span class="tech-icon" aria-hidden="true">🐍</span>
-                  <div class="tech-info">
-                    <div class="tech-name">Python</div>
-                    <div class="tech-role">Backend/ML</div>
-                  </div>
-                </div>
+        <div class="t2a-layout">
+          <!-- Input -->
+          <div class="input-card">
+            <div class="input-card-title">⌨️ Enter Text to Translate</div>
+            <textarea
+              class="text-input-area"
+              id="t2aInput"
+              placeholder="Type something… e.g. HELLO WORLD"
+              maxlength="120"
+              rows="3"
+              oninput="onT2AInput()"
+              onkeydown="t2aKeydown(event)"
+              aria-label="Text to translate into ASL"
+              spellcheck="false"
+            ></textarea>
+            <div class="input-footer">
+              <span class="char-count"
+                ><span id="charCount">0</span> / 120</span
+              >
+              <div class="input-opts">
+                <button
+                  class="voice-btn"
+                  id="voiceBtn"
+                  onclick="toggleVoice()"
+                  title="Voice input"
+                >
+                  🎙️ Voice
+                </button>
+                <button class="btn btn-primary" onclick="translateText()">
+                  ✋ Translate
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="about-info-card">
-            <div class="about-info-header">
-              <div class="about-info-icon" style="background:var(--violet-lt);" aria-hidden="true">🚀</div>
-              <div class="about-info-title">Getting Started</div>
+          <!-- ASL display -->
+          <div class="asl-display-card">
+            <div class="asl-display-header">
+              <div class="asl-display-title">✋ ASL Signs</div>
+              <div style="display: flex; gap: 8px; align-items: center">
+                <span class="asl-token-counter" id="tokenCounter"></span>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="replayASL()"
+                  id="replayBtn"
+                  style="display: none"
+                >
+                  ↺ Replay
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="clearASLDisplay()"
+                >
+                  🗑 Clear
+                </button>
+              </div>
             </div>
-            <div class="about-info-body">
-              Run <code
-                style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:0.85em;">Python Files/collect_data.py</code>
-              to record training samples, then <code
-                style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:0.85em;">Python Files/train_model.py</code>
-              to train the classifier, then launch <code
-                style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:0.85em;">Python Files/app.py</code>
-              for real-time translation.
+
+            <!-- Progress bar -->
+            <div
+              class="play-progress visible"
+              id="playProgress"
+              aria-hidden="true"
+            >
+              <div class="play-progress-fill" id="playFill"></div>
+            </div>
+
+            <!-- Video player area -->
+            <div class="asl-video-area" id="aslVideoArea">
+              <div class="asl-empty" id="aslEmpty">
+                <div class="asl-empty-icon" aria-hidden="true">✋</div>
+                <p>
+                  Type text above and click <strong>Translate</strong> to see
+                  ASL signs here.
+                </p>
+              </div>
+              <video
+                id="aslVideo"
+                style="display: none"
+                aria-label="ASL sign video"
+                playsinline
+              ></video>
+            </div>
+
+            <!-- Token queue — shows which sign is playing -->
+            <div class="asl-queue-bar" id="aslQueueBar"></div>
+
+            <div class="playback-bar">
+              <div
+                style="font-size: 0.82rem; color: var(--ink3)"
+                id="aslNowPlaying"
+              >
+                —
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="copyT2AText()">
+                📋 Copy text
+              </button>
             </div>
           </div>
 
+          <!-- ASL Reference Alphabet -->
         </div>
       </div>
+    </main>
 
-      <!-- Bottom spacer -->
-      <div style="padding-bottom:80px;"></div>
-    </div>
-  </main>
+    <!-- ═══════════════════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════════════════ -->
+    <main class="page" id="page-about" role="main">
+      <div class="container">
+        <div class="page-header" style="text-align: left; padding-bottom: 0">
+          <div class="section-label">ℹ️ About</div>
+        </div>
 
+        <div class="about-layout">
+          <div>
+            <h1
+              class="about-hero-text"
+              style="
+                font-size: clamp(2rem, 4vw, 3rem);
+                font-weight: 800;
+                letter-spacing: -0.03em;
+                line-height: 1.15;
+                margin-bottom: 20px;
+              "
+            >
+              Making ASL<br />
+              <span
+                style="
+                  background: var(--grad-hero);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                "
+                >accessible to all</span
+              >
+            </h1>
+            <p class="about-body">
+              Sign Language Assistant is a browser-based tool for translating
+              between American Sign Language gestures and written text — in real
+              time. It was built to make communication more accessible for the
+              Deaf and Hard of Hearing community.
+            </p>
+            <p class="about-body">
+              American Sign Language is the primary language for over
+              <strong>500,000</strong> people in the United States and Canada.
+              It is a complete, natural language with its own grammar, syntax,
+              and cultural richness — distinct from English.
+            </p>
+            <p class="about-body">
+              This tool uses computer vision to track hand landmarks and a
+              machine learning classifier to match them to ASL letters — running
+              entirely in your browser with no data sent to any server.
+            </p>
 
-  <!-- ═══════════════════════════════════════════
+            <div class="fact-cards">
+              <div class="fact-card">
+                <div class="fact-num">500K+</div>
+                <div class="fact-label">ASL users in North America</div>
+              </div>
+              <div class="fact-card">
+                <div class="fact-num">26</div>
+                <div class="fact-label">Letters in the ASL alphabet</div>
+              </div>
+              <div class="fact-card">
+                <div class="fact-num">21</div>
+                <div class="fact-label">Hand landmarks tracked</div>
+              </div>
+              <div class="fact-card">
+                <div class="fact-num">100%</div>
+                <div class="fact-label">On-device processing</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-cards">
+            <div class="about-info-card">
+              <div class="about-info-header">
+                <div
+                  class="about-info-icon fi-violet"
+                  style="background: var(--violet-lt)"
+                  aria-hidden="true"
+                >
+                  🎯
+                </div>
+                <div class="about-info-title">Purpose</div>
+              </div>
+              <div class="about-info-body">
+                To reduce communication barriers between hearing and Deaf
+                communities by making ASL translation fast, free, and accessible
+                directly in the browser.
+              </div>
+            </div>
+
+            <div class="about-info-card">
+              <div class="about-info-header">
+                <div
+                  class="about-info-icon"
+                  style="background: var(--blue-lt)"
+                  aria-hidden="true"
+                >
+                  🔬
+                </div>
+                <div class="about-info-title">How It Works</div>
+              </div>
+              <div class="about-info-body">
+                MediaPipe Hands extracts 21 3D landmarks per frame. These are
+                normalised (wrist = origin, unit bounding box) and fed to a
+                Random Forest classifier trained on ASL letter samples.
+                Predictions are smoothed over a 10-frame window.
+              </div>
+            </div>
+
+            <div class="about-info-card">
+              <div class="about-info-header">
+                <div
+                  class="about-info-icon"
+                  style="background: var(--teal-lt)"
+                  aria-hidden="true"
+                >
+                  🔒
+                </div>
+                <div class="about-info-title">Privacy</div>
+              </div>
+              <div class="about-info-body">
+                All processing happens on your device. No video frames, no
+                landmark data, and no text is ever sent to a server. Your camera
+                feed never leaves your browser.
+              </div>
+            </div>
+
+            <div class="about-info-card">
+              <div class="about-info-header">
+                <div
+                  class="about-info-icon"
+                  style="background: var(--amber-lt)"
+                  aria-hidden="true"
+                >
+                  ⚙️
+                </div>
+                <div class="about-info-title">Technologies Used</div>
+              </div>
+              <div class="about-info-body">
+                <div class="tech-grid">
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">🖐</span>
+                    <div class="tech-info">
+                      <div class="tech-name">MediaPipe</div>
+                      <div class="tech-role">Hand landmarks</div>
+                    </div>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">🌲</span>
+                    <div class="tech-info">
+                      <div class="tech-name">scikit-learn</div>
+                      <div class="tech-role">RF Classifier</div>
+                    </div>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">👁️</span>
+                    <div class="tech-info">
+                      <div class="tech-name">OpenCV</div>
+                      <div class="tech-role">Video capture</div>
+                    </div>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">🎙️</span>
+                    <div class="tech-info">
+                      <div class="tech-name">Web Speech</div>
+                      <div class="tech-role">Voice input</div>
+                    </div>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">🌐</span>
+                    <div class="tech-info">
+                      <div class="tech-name">HTML/CSS/JS</div>
+                      <div class="tech-role">Frontend</div>
+                    </div>
+                  </div>
+                  <div class="tech-item">
+                    <span class="tech-icon" aria-hidden="true">🐍</span>
+                    <div class="tech-info">
+                      <div class="tech-name">Python</div>
+                      <div class="tech-role">Backend/ML</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="about-info-card">
+              <div class="about-info-header">
+                <div
+                  class="about-info-icon"
+                  style="background: var(--violet-lt)"
+                  aria-hidden="true"
+                >
+                  🚀
+                </div>
+                <div class="about-info-title">Getting Started</div>
+              </div>
+              <div class="about-info-body">
+                Run
+                <code
+                  style="
+                    background: var(--bg3);
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-family: var(--mono);
+                    font-size: 0.85em;
+                  "
+                  >Python Files/collect_data.py</code
+                >
+                to record training samples, then
+                <code
+                  style="
+                    background: var(--bg3);
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-family: var(--mono);
+                    font-size: 0.85em;
+                  "
+                  >Python Files/train_model.py</code
+                >
+                to train the classifier, then launch
+                <code
+                  style="
+                    background: var(--bg3);
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-family: var(--mono);
+                    font-size: 0.85em;
+                  "
+                  >Python Files/app.py</code
+                >
+                for real-time translation.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom spacer -->
+        <div style="padding-bottom: 80px"></div>
+      </div>
+    </main>
+
+    <!-- ═══════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════ -->
-  <script src="script.js"></script>
-</body>
-
+    <script src="script.js"></script>
+  </body>
 </html>
